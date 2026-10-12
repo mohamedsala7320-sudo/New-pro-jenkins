@@ -25,14 +25,14 @@ pipeline {
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     
-                    // 1. تهيئة Terraform
-                    bat 'wsl terraform init'
+                    // استخدام المسار الكامل لـ wsl.exe لتجنب مشاكل تعرف النظام عليه
+                    bat 'C:\\Windows\\System32\\wsl.exe terraform init'
                     
-                    // 2. اختيار الـ Workspace أو إنشاؤها إن لم تكن موجودة
-                    bat "wsl terraform workspace select ${params.ENVIRONMENT} || wsl terraform workspace new ${params.ENVIRONMENT}"
+                    // اختيار الـ Workspace أو إنشاؤها إن لم تكن موجودة
+                    bat "C:\\Windows\\System32\\wsl.exe terraform workspace select ${params.ENVIRONMENT} || C:\\Windows\\System32\\wsl.exe terraform workspace new ${params.ENVIRONMENT}"
                     
-                    // 3. تطبيق التغييرات باستخدام ملف الـ tfvars الخاص بالبيئة المختارة
-                    bat "wsl terraform apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve"
+                    // تطبيق التغييرات باستخدام ملف الـ tfvars الخاص بالبيئة المختارة
+                    bat "C:\\Windows\\System32\\wsl.exe terraform apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve"
                 }
             }
         }
