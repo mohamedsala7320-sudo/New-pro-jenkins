@@ -23,6 +23,9 @@ pipeline {
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     
+                    // تحديد منطقة AWS الافتراضية لمنع خطأ الـ region الفارغ
+                    env.AWS_DEFAULT_REGION = "us-east-1"
+
                     // استخدام المسار المباشر والصحيح لملف terraform.exe داخل الأوامر
                     bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" init'
                     
@@ -31,6 +34,21 @@ pipeline {
                     bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" apply -var-file=%ENVIRONMENT%.tfvars -auto-approve'
                 }
             }
+        }
+    }
+
+    post {
+        failure {
+            mail(
+                subject: "Jenkins Pipeline Failed: ${env.JOB_NAME}",
+                body: """
+                    The Jenkins pipeline has failed during Terraform execution.
+                    Environment: ${params.ENVIRONMENT}
+                    Build Number: ${env.BUILD_NUMBER}
+                    Build URL: ${env.BUILD_URL}
+                """,
+                to: 'mohamedsala7320@gmail.com'
+            )
         }
     }
 }
