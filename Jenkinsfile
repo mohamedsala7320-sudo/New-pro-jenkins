@@ -20,14 +20,15 @@ pipeline {
             }
         }
 
-        stage('Terraform Apply with Admin Credentials') {
+        stage('Terraform Apply on LocalStack') {
             steps {
+                // استخدام بيانات وهمية لـ LocalStack لتجاوز الـ withCredentials
                 withCredentials([
                     string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     
-                    // استخدام المسار المباشر والصحيح لملف terraform.exe داخل الأوامر
+                    // استخدام المسار المباشر والصحيح لملف terraform.exe
                     bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" init'
                     
                     bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" workspace select %ENVIRONMENT% || "C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" workspace new %ENVIRONMENT%'
@@ -35,21 +36,6 @@ pipeline {
                     bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" apply -var-file=%ENVIRONMENT%.tfvars -auto-approve'
                 }
             }
-        }
-    }
-
-    post {
-        failure {
-            mail(
-                subject: "Jenkins Pipeline Failed: ${env.JOB_NAME}",
-                body: """
-                    The Jenkins pipeline has failed during Terraform execution.
-                    Environment: ${params.ENVIRONMENT}
-                    Build Number: ${env.BUILD_NUMBER}
-                    Build URL: ${env.BUILD_URL}
-                """,
-                to: 'mohamedsala7320@gmail.com'
-            )
         }
     }
 }
