@@ -23,10 +23,10 @@ pipeline {
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     
-                    // تشغيل أوامر Terraform مباشرة على ويندوز بدون wsl
-                    bat 'terraform init'
-                    bat "terraform workspace select ${params.ENVIRONMENT} || terraform workspace new ${params.ENVIRONMENT}"
-                    bat "terraform apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve"
+                    // استخدام المسار المباشر لملف التيرموفورم لكي يعمل مع Jenkins بدون مشاكل
+                    bat 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe init'
+                    bat 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Winget.Source_8wekyb3d8bbwe\\terraform.exe workspace select ${params.ENVIRONMENT} || C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe workspace new ${params.ENVIRONMENT}'
+                    bat 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve'
                 }
             }
         }
@@ -38,9 +38,7 @@ pipeline {
                 subject: "Jenkins Pipeline Failed: ${env.JOB_NAME}",
                 body: """
                     The Jenkins pipeline has failed during Terraform execution.
-
                     Environment: ${params.ENVIRONMENT}
-                    Job: ${env.JOB_NAME}
                     Build Number: ${env.BUILD_NUMBER}
                     Build URL: ${env.BUILD_URL}
                 """,
