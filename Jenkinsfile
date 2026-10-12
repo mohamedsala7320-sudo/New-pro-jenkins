@@ -23,27 +23,19 @@ pipeline {
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     
-                    // استخدام المسار المباشر لملف التيرموفورم لكي يعمل مع Jenkins بدون مشاكل
-                    bat 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe init'
-                    bat 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Winget.Source_8wekyb3d8bbwe\\terraform.exe workspace select ${params.ENVIRONMENT} || C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe workspace new ${params.ENVIRONMENT}'
-                    bat 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve'
+                    // تعريف مسار الـ Terraform في متغير نصي لتسهيل استخدامه بدون أخطاء
+                    def tfPath = 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe'
+                    
+                    // 1. تهيئة تيرموفورم
+                    bat "\"${tfPath}\" init"
+                    
+                    // 2. اختيار أو إنشاء الـ Workspace للبيئة المحددة
+                    bat "\"${tfPath}\" workspace select ${params.ENVIRONMENT} || \"${tfPath}\" workspace new ${params.ENVIRONMENT}"
+                    
+                    // 3. تطبيق التغييرات بناءً على ملف الـ tfvars الخاص بالبيئة
+                    bat "\"${tfPath}\" apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve"
                 }
             }
-        }
-    }
-
-    post {
-        failure {
-            mail(
-                subject: "Jenkins Pipeline Failed: ${env.JOB_NAME}",
-                body: """
-                    The Jenkins pipeline has failed during Terraform execution.
-                    Environment: ${params.ENVIRONMENT}
-                    Build Number: ${env.BUILD_NUMBER}
-                    Build URL: ${env.BUILD_URL}
-                """,
-                to: 'mohamedsala7320@gmail.com'
-            )
         }
     }
 }
