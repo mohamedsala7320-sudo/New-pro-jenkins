@@ -16,8 +16,10 @@ pipeline {
     stages {
         stage('Set Build Name') {
             steps {
-                // هذا السطر يقوم بتغيير اسم البناء في جينكينز ليظهر رقم البناء ومعه اسم البيئة
-                currentBuild.displayName = "#${env.BUILD_NUMBER} [${params.ENVIRONMENT}]"
+                script {
+                    // وضع الأمر داخل script block لكي يتقبله جينكينز بدون أخطاء
+                    currentBuild.displayName = "#${env.BUILD_NUMBER} [${params.ENVIRONMENT}]"
+                }
             }
         }
 
