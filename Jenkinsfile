@@ -23,17 +23,12 @@ pipeline {
                     string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
                     
-                    // تعريف مسار الـ Terraform في متغير نصي لتسهيل استخدامه بدون أخطاء
-                    def tfPath = 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe'
+                    // استخدام المسار المباشر والصحيح لملف terraform.exe داخل الأوامر
+                    bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" init'
                     
-                    // 1. تهيئة تيرموفورم
-                    bat "\"${tfPath}\" init"
+                    bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" workspace select %ENVIRONMENT% || "C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" workspace new %ENVIRONMENT%'
                     
-                    // 2. اختيار أو إنشاء الـ Workspace للبيئة المحددة
-                    bat "\"${tfPath}\" workspace select ${params.ENVIRONMENT} || \"${tfPath}\" workspace new ${params.ENVIRONMENT}"
-                    
-                    // 3. تطبيق التغييرات بناءً على ملف الـ tfvars الخاص بالبيئة
-                    bat "\"${tfPath}\" apply -var-file=${params.ENVIRONMENT}.tfvars -auto-approve"
+                    bat '"C:\\Users\\user\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HashiCorp.Terraform_Microsoft.Winget.Source_8wekyb3d8bbwe\\terraform.exe" apply -var-file=%ENVIRONMENT%.tfvars -auto-approve'
                 }
             }
         }
